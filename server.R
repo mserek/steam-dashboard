@@ -4,6 +4,8 @@ library(treemap)
 library(DT)
 library(dplyr)
 library(tidyr)
+library(plotly)
+library(ggplot2)
 
 
 data <- read.csv("data/steam_data.csv", sep = ",")
@@ -14,7 +16,7 @@ shinyServer(function(input, output) {
     total <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      total <- data[rows,] %>%
+      total <- data[rows, ] %>%
         select(total_ratings) %>%
         sum(.)
     }
@@ -30,7 +32,7 @@ shinyServer(function(input, output) {
     positive <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      positive <- data[rows,] %>%
+      positive <- data[rows, ] %>%
         select(positive_ratings) %>%
         sum(.)
     }
@@ -46,7 +48,7 @@ shinyServer(function(input, output) {
     negative <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      negative <- data[rows,] %>%
+      negative <- data[rows, ] %>%
         select(negative_ratings) %>%
         sum(.)
     }
@@ -62,10 +64,10 @@ shinyServer(function(input, output) {
     percent <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      positive <- data[rows,] %>%
+      positive <- data[rows, ] %>%
         select(positive_ratings) %>%
         sum(.)
-      total <- data[rows,] %>%
+      total <- data[rows, ] %>%
         select(total_ratings) %>%
         sum(.)
       percent = round(100 * positive / total)
@@ -82,13 +84,20 @@ shinyServer(function(input, output) {
   })
   
   output$mainDataTable <- renderDataTable({
+    dataByYear <- data %>%
+      filter(release_date >= input$dateInput[1]) %>%
+      filter(release_date <= input$dateInput[2]) %>%
+      filter(total_ratings >= input$minReviews) %>%
+      filter(average_playtime >= input$minAvgPlaytime) %>%
+      filter(price <= input$priceRange[1]) %>%
+      filter(price >= input$priceRange[2])
     datatable(data)
   })
   
   output$developerGamesPlot <- renderPlot({
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      publishers <- data[rows, ] %>%
+      publishers <- data[rows,] %>%
         group_by(publisher) %>%
         select(c(publisher, name, total_ratings))
       
@@ -109,6 +118,20 @@ shinyServer(function(input, output) {
         title = "Number of reviews for publisher's games",
         fontsize.title = 32
       )
+    }
+  })
+  
+  output$ratingToPlaytimePlot <- renderPlotly({
+    rows <- input$mainDataTable_rows_selected
+    if (!is.null(rows)) {
+      p <- ggplot(data[rows, ],
+                  aes(
+                    x = 100 * positive_ratings / (positive_ratings + negative_ratings),
+                    y = average_playtime
+                  )) +
+        geom_point(alpha = 0.5) +
+        theme_bw()
+      ggplotly(p)
     }
   })
   
