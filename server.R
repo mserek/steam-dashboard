@@ -88,9 +88,9 @@ shinyServer(function(input, output) {
       filter(release_date <= input$dateInput[2]) %>%
       filter(total_ratings >= input$minReviews) %>%
       filter(average_playtime >= input$minAvgPlaytime) %>%
-      filter(price <= input$priceRange[1]) %>%
-      filter(price >= input$priceRange[2])
-    datatable(data)
+      filter(price >= input$priceRange[1]) %>%
+      filter(price <= input$priceRange[2])
+    datatable(dataByYear)
   })
   
   output$developerGamesPlot <- renderPlot({
