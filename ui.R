@@ -8,7 +8,7 @@ library(shinyjs)
 
 dashboardPage(
   dashboardHeader(title = "Steam Games"),
-  dashboardSidebar(),
+  dashboardSidebar(disable = TRUE),
   dashboardBody(
     useShinyjs(),
     fluidRow(
