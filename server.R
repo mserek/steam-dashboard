@@ -6,11 +6,17 @@ library(dplyr)
 library(tidyr)
 library(shinyjs)
 library(plotly)
+library(scales)
 
 
 
 data <- read.csv("data/steam_data.csv", sep = ",")
 
+labels <- list("Number of positive reviews" = "positive_ratings",
+               "Number of negative reviews" = "negative_ratings",
+               "Average playtime" = "average_playtime",
+               "Price" = "price",
+               "Number of total reviews" = "total_ratings")
 
 shinyServer(function(input, output) {
   selectedData <- reactive({
@@ -199,26 +205,43 @@ shinyServer(function(input, output) {
   output$interactivePlot <- renderPlotly({
     rows <- input$mainDataTable_rows_all
     p <- ggplot(data[rows,],
-                aes(x=get(input$xAxis),
-                    y=get(input$yAxis),
+                aes(x=get(labels[[input$xAxis]]),
+                    y=get(labels[[input$yAxis]]),
                     text=paste("Developer: ", developer,
                                "\nGame: ", name,
                                "\nRelease date: ", release_date,
                                "\nRating: ", round(100*positive_ratings/total_ratings), "%",
                                "\nPrice: ", price, "$"),
-                    colour = round(100*positive_ratings/total_ratings))
+                    colour = round(100*positive_ratings/total_ratings)
+                    )
     ) +
+      labs(
+        x = input$xAxis,
+        y = input$yAxis
+      )+
       geom_jitter(
         width = 1,
         height = 1
       ) +
       scale_colour_gradient(
+        name = "Rating in %:",
         low = "red",
         high = "green",
         space = "Lab",
         na.value = "grey50",
         guide = "colourbar",
         aesthetics = "colour"
+      ) +
+      scale_x_continuous(
+        labels = comma_format(
+          big.mark = ".", 
+          decimal.mark = ","
+        )
+      ) +
+      scale_y_continuous(
+        labels = comma_format(
+          big.mark = ".", 
+          decimal.mark = ","        )
       ) +
       theme_bw()
     ggplotly(p, tooltip="text")
