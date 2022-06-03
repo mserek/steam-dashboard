@@ -10,13 +10,15 @@ library(scales)
 
 
 
-data <- read.csv("data/steam_data.csv", sep = ",")
+data <- read.csv("data/steam_data.csv", sep = ",", encoding = "UTF-8")
 
-labels <- list("Number of positive reviews" = "positive_ratings",
-               "Number of negative reviews" = "negative_ratings",
-               "Average playtime" = "average_playtime",
-               "Price" = "price",
-               "Number of total reviews" = "total_ratings")
+labels <- list(
+  "Number of positive reviews" = "positive_ratings",
+  "Number of negative reviews" = "negative_ratings",
+  "Average playtime" = "average_playtime",
+  "Price" = "price",
+  "Number of total reviews" = "total_ratings"
+)
 
 shinyServer(function(input, output) {
   selectedData <- reactive({
@@ -33,7 +35,7 @@ shinyServer(function(input, output) {
     total <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      total <- selectedData()[rows,] %>%
+      total <- selectedData()[rows, ] %>%
         select(total_ratings) %>%
         sum(.)
     }
@@ -49,7 +51,7 @@ shinyServer(function(input, output) {
     positive <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      positive <- selectedData()[rows,] %>%
+      positive <- selectedData()[rows, ] %>%
         select(positive_ratings) %>%
         sum(.)
     }
@@ -65,7 +67,7 @@ shinyServer(function(input, output) {
     negative <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      negative <- selectedData()[rows,] %>%
+      negative <- selectedData()[rows, ] %>%
         select(negative_ratings) %>%
         sum(.)
     }
@@ -82,10 +84,10 @@ shinyServer(function(input, output) {
     chosen_color <- "black"
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      positive <- selectedData()[rows,] %>%
+      positive <- selectedData()[rows, ] %>%
         select(positive_ratings) %>%
         sum(.)
-      total <- selectedData()[rows,] %>%
+      total <- selectedData()[rows, ] %>%
         select(total_ratings) %>%
         sum(.)
       percent <- round(100 * positive / total)
@@ -103,7 +105,7 @@ shinyServer(function(input, output) {
     total <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      total <- selectedData()[rows,] %>%
+      total <- selectedData()[rows, ] %>%
         select(price) %>%
         sum(.)
     }
@@ -119,7 +121,7 @@ shinyServer(function(input, output) {
     total <- 0
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      total <- selectedData()[rows,] %>%
+      total <- selectedData()[rows, ] %>%
         select(average_playtime) %>%
         sum(.)
     }
@@ -147,11 +149,11 @@ shinyServer(function(input, output) {
     if (!is.null(rows)) {
       variable = input$visualizedVariableSelection
       
-      games <- selectedData()[rows, ] %>%
+      games <- selectedData()[rows,] %>%
         group_by(publisher) %>%
         select(c(publisher, name, total_ratings, price, average_playtime))
       
-      publishers <-  selectedData()[rows, ] %>%
+      publishers <-  selectedData()[rows,] %>%
         group_by(publisher) %>%
         summarise(
           total_ratings = sum(total_ratings),
@@ -204,25 +206,30 @@ shinyServer(function(input, output) {
   
   output$interactivePlot <- renderPlotly({
     rows <- input$mainDataTable_rows_all
-    p <- ggplot(data[rows,],
-                aes(x=get(labels[[input$xAxis]]),
-                    y=get(labels[[input$yAxis]]),
-                    text=paste("Developer: ", developer,
-                               "\nGame: ", name,
-                               "\nRelease date: ", release_date,
-                               "\nRating: ", round(100*positive_ratings/total_ratings), "%",
-                               "\nPrice: ", price, "$"),
-                    colour = round(100*positive_ratings/total_ratings)
-                    )
-    ) +
-      labs(
-        x = input$xAxis,
-        y = input$yAxis
-      )+
-      geom_jitter(
-        width = 1,
-        height = 1
-      ) +
+    p <- ggplot(data[rows, ],
+                aes(
+                  x = get(labels[[input$xAxis]]),
+                  y = get(labels[[input$yAxis]]),
+                  text = paste(
+                    "Developer: ",
+                    developer,
+                    "\nGame: ",
+                    name,
+                    "\nRelease date: ",
+                    release_date,
+                    "\nRating: ",
+                    round(100 * positive_ratings / total_ratings),
+                    "%",
+                    "\nPrice: ",
+                    price,
+                    "$"
+                  ),
+                  colour = round(100 * positive_ratings / total_ratings)
+                )) +
+      labs(x = input$xAxis,
+           y = input$yAxis) +
+      geom_jitter(width = 1,
+                  height = 1) +
       scale_colour_gradient(
         name = "Rating in %:",
         low = "red",
@@ -232,19 +239,16 @@ shinyServer(function(input, output) {
         guide = "colourbar",
         aesthetics = "colour"
       ) +
-      scale_x_continuous(
-        labels = comma_format(
-          big.mark = ".", 
-          decimal.mark = ","
-        )
-      ) +
-      scale_y_continuous(
-        labels = comma_format(
-          big.mark = ".", 
-          decimal.mark = ","        )
-      ) +
+      
+      scale_x_continuous(labels = comma_format(big.mark = ".",
+                                               decimal.mark = ",")) +
+      scale_y_continuous(labels = comma_format(big.mark = ".",
+                                               decimal.mark = ",")) +
+      labs(x = input$xAxis,
+           y = input$yAxis,
+           colour = "Rating in %") +
       theme_bw()
-    ggplotly(p, tooltip="text")
+    ggplotly(p, tooltip = "text")
   })
   
 })
