@@ -9,7 +9,7 @@ library(plotly)
 
 
 
-data <- read.csv("data/steam_data.csv", sep = ",")
+data <- read.csv("data/steam_data.csv", sep = ",", encoding="UTF-8")
 
 
 shinyServer(function(input, output) {
@@ -220,6 +220,7 @@ shinyServer(function(input, output) {
         guide = "colourbar",
         aesthetics = "colour"
       ) +
+      labs(x = input$xAxis, y =input$yAxis, colour = "Rating in %") +
       theme_bw()
     ggplotly(p, tooltip="text")
   })
