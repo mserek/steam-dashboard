@@ -72,6 +72,7 @@ shinyServer(function(input, output) {
   
   output$percentReviewsBox <- renderInfoBox({
     percent <- 0
+    chosen_color <- "black"
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
       positive <- selectedData()[rows,] %>%
@@ -80,16 +81,46 @@ shinyServer(function(input, output) {
       total <- selectedData()[rows,] %>%
         select(total_ratings) %>%
         sum(.)
-      percent = round(100 * positive / total)
+      percent <- round(100 * positive / total)
+      chosen_color = ifelse(percent < 40, "red", ifelse(percent < 70, "yellow", "green"))
     }
-    
-    #implement 0-40% red, 40-70 yellow, 70-100 blue/green
-    chosen_color = "black"
-    shinydashboard::infoBox(
+      shinydashboard::infoBox(
       "Rating: ",
       paste(percent, "%"),
       icon = icon("chart-line", lib = "font-awesome"),
       color = chosen_color
+    )
+  })
+  
+  output$totalPriceBox <- renderInfoBox({
+    total <- 0
+    rows <- input$mainDataTable_rows_selected
+    if (!is.null(rows)) {
+      total <- selectedData()[rows,] %>%
+        select(price) %>%
+        sum(.)
+    }
+    shinydashboard::infoBox(
+      "Total price:",
+      paste(total),
+      icon = icon("dollar-sign", lib = "font-awesome"),
+      color = "olive"
+    )
+  })
+  
+  output$totalTimeBox <- renderInfoBox({
+    total <- 0
+    rows <- input$mainDataTable_rows_selected
+    if (!is.null(rows)) {
+      total <- selectedData()[rows,] %>%
+        select(average_playtime) %>%
+        sum(.)
+    }
+    shinydashboard::infoBox(
+      "Total average time played:",
+      paste(total),
+      icon = icon("clock", lib = "font-awesome"),
+      color = "navy"
     )
   })
   
@@ -125,7 +156,7 @@ shinyServer(function(input, output) {
         palette = "Set2",
         border.col = c("white", "black"),
         border.lwds = c(4, 2),
-        title = "Number of reviews for publisher's games",
+        title = "Number of reviews for publishers' games",
         fontsize.title = 32
       )
     }
