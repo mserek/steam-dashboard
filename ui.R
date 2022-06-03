@@ -66,6 +66,6 @@ dashboardPage(
       )
     ),
     fluidRow(dataTableOutput("mainDataTable")),
-    fluidRow(plotOutput("developerGamesPlot")),
+    fluidRow(plotlyOutput("developerGamesPlot")),
   )
 )

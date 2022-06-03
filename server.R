@@ -5,6 +5,7 @@ library(DT)
 library(dplyr)
 library(tidyr)
 library(shinyjs)
+library(plotly)
 
 
 
@@ -135,31 +136,32 @@ shinyServer(function(input, output) {
     reset("priceRange")
   })
   
-  output$developerGamesPlot <- renderPlot({
+  output$developerGamesPlot <- renderPlotly({
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      publishers <- selectedData()[rows, ] %>%
+      games <- selectedData()[rows, ]%>%
         group_by(publisher) %>%
         select(c(publisher, name, total_ratings))
-      
-      p <- treemap(
-        publishers,
-        index = c("publisher", "name"),
-        vSize = "total_ratings",
-        type = "index",
-        fontsize.labels = c(16, 8),
-        fontface.labels = c(2, 3),
-        fontcolor.labels = c("white", "black"),
-        bg.labels = c("transparent"),
-        align.labels = list(c("center", "center"),
-                            c("right", "bottom")),
-        palette = "Set2",
-        border.col = c("white", "black"),
-        border.lwds = c(4, 2),
-        title = "Number of reviews for publishers' games",
-        fontsize.title = 32
-      )
+  
+
+      publishers <-  selectedData()[rows, ] %>%
+        group_by(publisher) %>% 
+        summarise(total_ratings = sum(total_ratings)) %>%
+        mutate(parent = "")
+
+      fig <- plot_ly(
+        type="treemap",
+        labels=c(games$name, publishers$publisher),
+        parents=c(games$publisher, publishers$parent),
+        values = c(games$total_ratings, publishers$total_ratings),
+        branchvalues="total",
+        textinfo="label+value",
+        outsidetextfont=list(size=20, color= "darkblue"),
+        marker=list(line= list(width=2)),
+        pathbar=list(visible= FALSE),
+        domain=list(column=1))
     }
+    
   })
   
 })
