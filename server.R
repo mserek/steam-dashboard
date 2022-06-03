@@ -4,6 +4,7 @@ library(treemap)
 library(DT)
 library(dplyr)
 library(tidyr)
+library(shinyjs)
 
 
 
@@ -94,6 +95,13 @@ shinyServer(function(input, output) {
   
   output$mainDataTable <- renderDataTable({
     datatable(selectedData())
+  })
+  
+  observeEvent(input$restartButton, {
+    reset("dateInput")
+    reset("minReviews")
+    reset("minAvgPlaytime")
+    reset("priceRange")
   })
   
   output$developerGamesPlot <- renderPlot({

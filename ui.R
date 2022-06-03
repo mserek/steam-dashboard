@@ -1,6 +1,7 @@
 library(shiny)
 library(shinydashboard)
 library(DT)
+library(shinyjs)
 
 
 
@@ -9,6 +10,7 @@ dashboardPage(
   dashboardHeader(title = "Steam Games"),
   dashboardSidebar(),
   dashboardBody(
+    useShinyjs(),
     fluidRow(
       shinydashboard::infoBoxOutput("totalReviewsBox"),
       shinydashboard::infoBoxOutput("percentReviewsBox")
@@ -44,6 +46,10 @@ dashboardPage(
         value = c(0, 80),
         min = 0,
         max = 80
+      ),
+      actionButton(
+        "restartButton",
+        label = "Set all filters to default"
       )
     ),
     fluidRow(dataTableOutput("mainDataTable")),
