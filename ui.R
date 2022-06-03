@@ -79,6 +79,19 @@ dashboardPage(
         inline = TRUE
       )
     )),
-    fluidRow(plotlyOutput("developerGamesPlot"))
+    fluidRow(plotlyOutput("developerGamesPlot")),
+    flowLayout(
+      selectInput("xAxis", label="X-axis", choices=c("positive_ratings",
+                                                     "negative_ratings",
+                                                     "average_playtime",
+                                                     "price",
+                                                     "total_ratings")),
+      selectInput("yAxis", label="Y-axis", choices=c("positive_ratings",
+                                                     "negative_ratings",
+                                                     "average_playtime",
+                                                     "price",
+                                                     "total_ratings"))
+    ),
+    fluidRow(plotlyOutput("interactivePlot"))
   )
 )
