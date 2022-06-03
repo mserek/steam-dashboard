@@ -85,7 +85,7 @@ shinyServer(function(input, output) {
       percent <- round(100 * positive / total)
       chosen_color = ifelse(percent < 40, "red", ifelse(percent < 70, "yellow", "green"))
     }
-      shinydashboard::infoBox(
+    shinydashboard::infoBox(
       "Rating: ",
       paste(percent, "%"),
       icon = icon("chart-line", lib = "font-awesome"),
@@ -139,29 +139,60 @@ shinyServer(function(input, output) {
   output$developerGamesPlot <- renderPlotly({
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
-      games <- selectedData()[rows, ]%>%
+      variable = input$visualizedVariableSelection
+      
+      games <- selectedData()[rows, ] %>%
         group_by(publisher) %>%
-        select(c(publisher, name, total_ratings))
-  
-
+        select(c(publisher, name, total_ratings, price, average_playtime))
+      
       publishers <-  selectedData()[rows, ] %>%
-        group_by(publisher) %>% 
-        summarise(total_ratings = sum(total_ratings)) %>%
+        group_by(publisher) %>%
+        summarise(
+          total_ratings = sum(total_ratings),
+          price = sum(price),
+          average_playtime = sum(average_playtime)
+        ) %>%
         mutate(parent = "")
-
+      
+      
+      title = paste("Publishers' games ", variable)
+      
+      if (variable == "total reviews") {
+        values = c(games$total_ratings, publishers$total_ratings)
+        texttemplate = "%{label}<br>%{value} reviews"
+        
+      } else if (variable == "prices") {
+        values = c(games$price, publishers$price)
+        texttemplate = "%{label}<br>%{value} $"
+        
+      } else if (variable == "average playtimes") {
+        values = c(games$average_playtime, publishers$average_playtime)
+        texttemplate = "%{label}<br>%{value} minutes"
+      }
+      
       fig <- plot_ly(
-        type="treemap",
-        labels=c(games$name, publishers$publisher),
-        parents=c(games$publisher, publishers$parent),
-        values = c(games$total_ratings, publishers$total_ratings),
-        branchvalues="total",
-        textinfo="label+value",
-        outsidetextfont=list(size=20, color= "darkblue"),
-        marker=list(line= list(width=2)),
-        pathbar=list(visible= FALSE),
-        domain=list(column=1))
+        title = title,
+        type = "treemap",
+        labels = c(games$name, publishers$publisher),
+        parents = c(games$publisher, publishers$parent),
+        branchvalues = "total",
+        values = values,
+        texttemplate = texttemplate,
+        outsidetextfont = list(size = 20, color = "darkblue"),
+        marker = list(line = list(width = 2)),
+        pathbar = list(visible = FALSE),
+        domain = list(column = 1)
+      )
+    } else {
+      p <- plotly_empty(mode = "markers") %>%
+        config(displayModeBar = FALSE) %>%
+        layout(
+          title = list(
+            text = "Mark some rows in the table above to visualize!",
+            yref = "paper",
+            y = 0.5
+          )
+        )
     }
-    
   })
-  
 })

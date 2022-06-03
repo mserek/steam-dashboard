@@ -2,7 +2,7 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(shinyjs)
-
+library(plotly)
 
 
 
@@ -22,7 +22,8 @@ dashboardPage(
       shinydashboard::infoBoxOutput("totalTimeBox")
     ),
     flowLayout(
-      column(12,
+      column(
+        12,
         dateRangeInput(
           "dateInput",
           label = "Period:",
@@ -32,7 +33,8 @@ dashboardPage(
           max = "2019-05-01"
         )
       ),
-      column(12,
+      column(
+        12,
         numericInput(
           "minReviews",
           label = "Minimal number of reviews:",
@@ -40,7 +42,8 @@ dashboardPage(
           min = 0
         )
       ),
-      column(12,
+      column(
+        12,
         numericInput(
           "minAvgPlaytime",
           label = "Minimal average playtime:",
@@ -48,7 +51,8 @@ dashboardPage(
           min = 0
         )
       ),
-      column(12,
+      column(
+        12,
         sliderInput(
           "priceRange",
           label = "Price range in $:",
@@ -57,15 +61,24 @@ dashboardPage(
           max = 80
         )
       ),
-      column(12,
+      column(
+        12,
         div(style = "height:24px;"),
-        actionButton(
-          "restartButton",
-          label = "Set all filters to default"
-        )
+        actionButton("restartButton",
+                     label = "Set all filters to default"),
       )
     ),
     fluidRow(dataTableOutput("mainDataTable")),
-    fluidRow(plotlyOutput("developerGamesPlot")),
+    fluidRow(column(
+      12,
+      align = "center",
+      radioButtons(
+        "visualizedVariableSelection",
+        "Choose visualized variable:",
+        c("total reviews", "prices", "average playtimes"),
+        inline = TRUE
+      )
+    )),
+    fluidRow(plotlyOutput("developerGamesPlot"))
   )
 )
