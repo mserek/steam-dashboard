@@ -192,7 +192,7 @@ shinyServer(function(input, output) {
         domain = list(column = 1)
       )
     } else {
-      p <- plotly_empty(mode = "markers") %>%
+      p <- plotly_empty(mode = "markers", type="scatter") %>%
         config(displayModeBar = FALSE) %>%
         layout(
           title = list(
@@ -205,8 +205,7 @@ shinyServer(function(input, output) {
   })
   
   output$interactivePlot <- renderPlotly({
-    rows <- input$mainDataTable_rows_all
-    p <- ggplot(data[rows, ],
+    p <- ggplot(selectedData(),
                 aes(
                   x = get(labels[[input$xAxis]]),
                   y = get(labels[[input$yAxis]]),
