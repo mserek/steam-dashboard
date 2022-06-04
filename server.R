@@ -148,6 +148,7 @@ shinyServer(function(input, output) {
     rows <- input$mainDataTable_rows_selected
     if (!is.null(rows)) {
       variable = input$visualizedVariableSelection
+      title = paste("Publishers' games ", variable)
       
       games <- selectedData()[rows,] %>%
         group_by(publisher) %>%
@@ -160,10 +161,9 @@ shinyServer(function(input, output) {
           price = sum(price),
           average_playtime = sum(average_playtime)
         ) %>%
-        mutate(parent = "")
+        mutate(parent = title)
       
       
-      title = paste("Publishers' games ", variable)
       
       if (variable == "total reviews") {
         values = c(games$total_ratings, publishers$total_ratings)
@@ -179,7 +179,6 @@ shinyServer(function(input, output) {
       }
       
       fig <- plot_ly(
-        title = title,
         type = "treemap",
         labels = c(games$name, publishers$publisher),
         parents = c(games$publisher, publishers$parent),
