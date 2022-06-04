@@ -5,12 +5,26 @@ library(shinyjs)
 library(plotly)
 
 
-
 dashboardPage(
-  dashboardHeader(title = "Steam Games"),
+  dashboardHeader(disable = TRUE),
   dashboardSidebar(disable = TRUE),
   dashboardBody(
+    tags$head(
+      tags$link(rel = "stylesheet", type = "text/css", href = "css/style.css")
+    ),
+    
     useShinyjs(),
+    
+    fluidRow(
+      column(
+        width = 6,
+        includeMarkdown("www/header.md"),
+        class = "header"
+      ),
+      column(width = 6, a(img(
+        src = "logo.png", id = "logo"
+      ), href = "https://www.put.poznan.pl/"))
+    ),
     fluidRow(
       shinydashboard::infoBoxOutput("percentReviewsBox"),
       shinydashboard::infoBoxOutput("positiveReviewsBox"),
@@ -81,16 +95,28 @@ dashboardPage(
     )),
     fluidRow(plotlyOutput("developerGamesPlot")),
     flowLayout(
-      selectInput("xAxis", label="X-axis", choices=c("Number of positive reviews",
-                                                     "Number of negative reviews",
-                                                     "Average playtime",
-                                                     "Price",
-                                                     "Number of total reviews")),
-      selectInput("yAxis", label="Y-axis", choices=c("Number of positive reviews",
-                                                     "Number of negative reviews",
-                                                     "Average playtime",
-                                                     "Price",
-                                                     "Number of total reviews"))
+      selectInput(
+        "xAxis",
+        label = "X-axis",
+        choices = c(
+          "Number of positive reviews",
+          "Number of negative reviews",
+          "Average playtime",
+          "Price",
+          "Number of total reviews"
+        )
+      ),
+      selectInput(
+        "yAxis",
+        label = "Y-axis",
+        choices = c(
+          "Number of positive reviews",
+          "Number of negative reviews",
+          "Average playtime",
+          "Price",
+          "Number of total reviews"
+        )
+      )
     ),
     fluidRow(plotlyOutput("interactivePlot"))
   )
