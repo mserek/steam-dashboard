@@ -3,6 +3,7 @@ library(shinydashboard)
 library(DT)
 library(shinyjs)
 library(plotly)
+library(markdown)
 
 
 dashboardPage(
@@ -83,41 +84,51 @@ dashboardPage(
       )
     ),
     fluidRow(dataTableOutput("mainDataTable")),
-    fluidRow(column(
-      12,
-      align = "center",
-      radioButtons(
-        "visualizedVariableSelection",
-        "Choose visualized variable:",
-        c("total reviews", "prices", "average playtimes"),
-        inline = TRUE
-      )
-    )),
-    fluidRow(plotlyOutput("developerGamesPlot")),
-    flowLayout(
-      selectInput(
-        "xAxis",
-        label = "X-axis",
-        choices = c(
-          "Number of positive reviews",
-          "Number of negative reviews",
-          "Average playtime",
-          "Price",
-          "Number of total reviews"
-        )
+  
+    tabsetPanel(
+      tabPanel(
+        "Publishers' games ",
+        fluidRow(column(
+          12,
+          align = "center",
+          radioButtons(
+            "visualizedVariableSelection",
+            "Choose visualized variable:",
+            c("total reviews", "prices", "average playtimes"),
+            inline = TRUE
+          )
+        )),
+        fluidRow(plotlyOutput("developerGamesPlot"))
       ),
-      selectInput(
-        "yAxis",
-        label = "Y-axis",
-        choices = c(
-          "Number of positive reviews",
-          "Number of negative reviews",
-          "Average playtime",
-          "Price",
-          "Number of total reviews"
-        )
-      )
+      tabPanel(
+        "Idk how to name this",
+        
+        flowLayout(
+          selectInput(
+            "xAxis",
+            label = "X-axis",
+            choices = c(
+              "Number of positive reviews",
+              "Number of negative reviews",
+              "Average playtime",
+              "Price",
+              "Number of total reviews"
+            )
+          ),
+          selectInput(
+            "yAxis",
+            label = "Y-axis",
+            choices = c(
+              "Number of positive reviews",
+              "Number of negative reviews",
+              "Average playtime",
+              "Price",
+              "Number of total reviews"
+            )
+          )
+        ),
+        fluidRow(plotlyOutput("interactivePlot"))
+      ),
     ),
-    fluidRow(plotlyOutput("interactivePlot"))
   )
 )
