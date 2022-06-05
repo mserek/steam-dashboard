@@ -101,7 +101,7 @@ dashboardPage(
         fluidRow(plotlyOutput("developerGamesPlot"))
       ),
       tabPanel(
-        "Idk how to name this",
+        "Plot with interactive axis",
         
         flowLayout(
           selectInput(

@@ -10,7 +10,8 @@ library(scales)
 
 
 
-data <- read.csv("data/steam_data.csv", sep = ",", encoding = "UTF-8")
+data <-
+  read.csv("data/steam_data.csv", sep = ",", encoding = "UTF-8")
 
 labels <- list(
   "Number of positive reviews" = "positive_ratings",
@@ -191,7 +192,7 @@ shinyServer(function(input, output) {
         domain = list(column = 1)
       )
     } else {
-      p <- plotly_empty(mode = "markers", type="scatter") %>%
+      p <- plotly_empty(mode = "markers", type = "scatter") %>%
         config(displayModeBar = FALSE) %>%
         layout(
           title = list(
