@@ -135,7 +135,10 @@ shinyServer(function(input, output) {
   })
   
   output$mainDataTable <- renderDataTable({
-    datatable(selectedData())
+    datatable(
+      selectedData(),
+      options = list(scrollX = TRUE)
+    )
   })
   
   observeEvent(input$restartButton, {
